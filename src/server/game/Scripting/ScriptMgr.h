@@ -40,6 +40,7 @@
 
 // Add support old api modules
 #include "AllScriptsObjects.h"
+#include "SpellMgr.h"
 
 class AuctionHouseObject;
 class AuraScript;
@@ -476,6 +477,9 @@ public: /* PlayerScript */
     bool AnticheatHandleDoubleJump(Player* player, Unit* mover);
     bool AnticheatCheckMovementInfo(Player* player, MovementInfo const& movementInfo, Unit* mover, bool jump);
 
+public: /* StatSystemScript */
+    bool OnUpdateAttackPowerAndDamageReplaceWithAlternativeCalculation(Player* player, bool ranged);
+
 public: /* AccountScript */
     void OnAccountLogin(uint32 accountId);
     void OnBeforeAccountDelete(uint32 accountId);
@@ -564,6 +568,7 @@ public: /* UnitScript */
     void OnUnitEnterCombat(Unit* unit, Unit* victim);
     void OnUnitDeath(Unit* unit, Unit* killer);
     void OnUnitSetShapeshiftForm(Unit* unit, uint8 form);
+    bool OnExtraProcHandleReactionStates(Unit* unit, uint32 procs);
 
 public: /* MovementHandlerScript */
     void OnPlayerMove(Player* player, MovementInfo movementInfo, uint32 opcode);

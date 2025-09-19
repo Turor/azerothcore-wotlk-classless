@@ -346,193 +346,198 @@ void Player::ApplyFeralAPBonus(int32 amount, bool apply)
 
 void Player::UpdateAttackPowerAndDamage(bool ranged)
 {
-    float val2 = 0.0f;
-    float level = float(GetLevel());
-
-    sScriptMgr->OnPlayerBeforeUpdateAttackPowerAndDamage(this, level, val2, ranged);
-
-    UnitMods unitMod = ranged ? UNIT_MOD_ATTACK_POWER_RANGED : UNIT_MOD_ATTACK_POWER;
-
-    uint16 index = UNIT_FIELD_ATTACK_POWER;
-    uint16 index_mod = UNIT_FIELD_ATTACK_POWER_MODS;
-    uint16 index_mult = UNIT_FIELD_ATTACK_POWER_MULTIPLIER;
-
-    if (ranged)
+    bool isUsingAlternativeCalculation = sScriptMgr->OnUpdateAttackPowerAndDamageReplaceWithAlternativeCalculation(this, ranged);
+    if (!isUsingAlternativeCalculation)
     {
-        index = UNIT_FIELD_RANGED_ATTACK_POWER;
-        index_mod = UNIT_FIELD_RANGED_ATTACK_POWER_MODS;
-        index_mult = UNIT_FIELD_RANGED_ATTACK_POWER_MULTIPLIER;
+        float baseAttackPower = 0.0f;
+        float level = float(GetLevel());
 
-        if (IsClass(CLASS_HUNTER, CLASS_CONTEXT_STATS))
+        sScriptMgr->OnPlayerBeforeUpdateAttackPowerAndDamage(this, level, baseAttackPower, ranged);
+
+        UnitMods unitMod = ranged ? UNIT_MOD_ATTACK_POWER_RANGED : UNIT_MOD_ATTACK_POWER;
+
+        uint16 index = UNIT_FIELD_ATTACK_POWER;
+        uint16 index_mod = UNIT_FIELD_ATTACK_POWER_MODS;
+        uint16 index_mult = UNIT_FIELD_ATTACK_POWER_MULTIPLIER;
+
+        if (ranged)
         {
-            val2 = level * 2.0f + GetStat(STAT_AGILITY) - 10.0f;
-        }
-        else if (IsClass(CLASS_ROGUE, CLASS_CONTEXT_STATS) || IsClass(CLASS_WARRIOR, CLASS_CONTEXT_STATS))
-        {
-            val2 = level + GetStat(STAT_AGILITY) - 10.0f;
-        }
-        else if (IsClass(CLASS_DRUID, CLASS_CONTEXT_STATS))
-        {
-            switch (GetShapeshiftForm())
+            index = UNIT_FIELD_RANGED_ATTACK_POWER;
+            index_mod = UNIT_FIELD_RANGED_ATTACK_POWER_MODS;
+            index_mult = UNIT_FIELD_RANGED_ATTACK_POWER_MULTIPLIER;
+
+
+            if (IsClass(CLASS_HUNTER, CLASS_CONTEXT_STATS))
             {
-            case FORM_CAT:
-            case FORM_BEAR:
-            case FORM_DIREBEAR:
-                val2 = 0.0f;
-                break;
-            default:
-                val2 = GetStat(STAT_AGILITY) - 10.0f;
-                break;
+                baseAttackPower = level * 2.0f + GetStat(STAT_AGILITY) - 10.0f;
+            }
+            else if (IsClass(CLASS_ROGUE, CLASS_CONTEXT_STATS) || IsClass(CLASS_WARRIOR, CLASS_CONTEXT_STATS))
+            {
+                baseAttackPower = level + GetStat(STAT_AGILITY) - 10.0f;
+            }
+            else if (IsClass(CLASS_DRUID, CLASS_CONTEXT_STATS))
+            {
+                switch (GetShapeshiftForm())
+                {
+                    case FORM_CAT:
+                    case FORM_BEAR:
+                    case FORM_DIREBEAR:
+                        baseAttackPower = 0.0f;
+                        break;
+                    default:
+                        baseAttackPower = GetStat(STAT_AGILITY) - 10.0f;
+                        break;
+                }
+            }
+            else
+            {
+                baseAttackPower = GetStat(STAT_AGILITY) - 10.0f;
             }
         }
         else
         {
-            val2 = GetStat(STAT_AGILITY) - 10.0f;
-        }
-    }
-    else
-    {
-        if (IsClass(CLASS_PALADIN, CLASS_CONTEXT_STATS) || IsClass(CLASS_DEATH_KNIGHT, CLASS_CONTEXT_STATS) || IsClass(CLASS_WARRIOR, CLASS_CONTEXT_STATS))
-        {
-            val2 = level * 3.0f + GetStat(STAT_STRENGTH) * 2.0f - 20.0f;
-        }
-        else if (IsClass(CLASS_HUNTER, CLASS_CONTEXT_STATS) || IsClass(CLASS_SHAMAN, CLASS_CONTEXT_STATS) || IsClass(CLASS_ROGUE, CLASS_CONTEXT_STATS))
-        {
-            val2 = level * 2.0f + GetStat(STAT_STRENGTH) + GetStat(STAT_AGILITY) - 20.0f;
-        }
-        else if (IsClass(CLASS_DRUID, CLASS_CONTEXT_STATS))
-        {
-            // Check if Predatory Strikes is skilled
-            float mLevelMult = 0.0f;
-            float weapon_bonus = 0.0f;
-            if (IsInFeralForm())
+            if (IsClass(CLASS_PALADIN, CLASS_CONTEXT_STATS) || IsClass(CLASS_DEATH_KNIGHT, CLASS_CONTEXT_STATS) || IsClass(CLASS_WARRIOR, CLASS_CONTEXT_STATS))
             {
-                Unit::AuraEffectList const& mDummy = GetAuraEffectsByType(SPELL_AURA_DUMMY);
-                for (Unit::AuraEffectList::const_iterator itr = mDummy.begin(); itr != mDummy.end(); ++itr)
+                baseAttackPower = level * 3.0f + GetStat(STAT_STRENGTH) * 2.0f - 20.0f;
+            }
+            else if (IsClass(CLASS_HUNTER, CLASS_CONTEXT_STATS) || IsClass(CLASS_SHAMAN, CLASS_CONTEXT_STATS) || IsClass(CLASS_ROGUE, CLASS_CONTEXT_STATS))
+            {
+                baseAttackPower = level * 2.0f + GetStat(STAT_STRENGTH) + GetStat(STAT_AGILITY) - 20.0f;
+            }
+            else if (IsClass(CLASS_DRUID, CLASS_CONTEXT_STATS))
+            {
+                // Check if Predatory Strikes is skilled
+                float mLevelMult = 0.0f;
+                float weapon_bonus = 0.0f;
+                if (IsInFeralForm())
                 {
-                    AuraEffect* aurEff = *itr;
-                    if (aurEff->GetSpellInfo()->SpellIconID == 1563)
+                    Unit::AuraEffectList const& mDummy = GetAuraEffectsByType(SPELL_AURA_DUMMY);
+                    for (Unit::AuraEffectList::const_iterator itr = mDummy.begin(); itr != mDummy.end(); ++itr)
                     {
-                        switch (aurEff->GetEffIndex())
+                        AuraEffect* aurEff = *itr;
+                        if (aurEff->GetSpellInfo()->SpellIconID == 1563)
                         {
-                        case 0: // Predatory Strikes (effect 0)
-                            mLevelMult = CalculatePct(1.0f, aurEff->GetAmount());
-                            break;
-                        case 1: // Predatory Strikes (effect 1)
-                            if (Item* mainHand = m_items[EQUIPMENT_SLOT_MAINHAND])
+                            switch (aurEff->GetEffIndex())
                             {
-                                // also gains % attack power from equipped weapon
-                                ItemTemplate const* proto = mainHand->GetTemplate();
-                                if (!proto)
-                                    continue;
+                                case 0: // Predatory Strikes (effect 0)
+                                    mLevelMult = CalculatePct(1.0f, aurEff->GetAmount());
+                                    break;
+                                case 1: // Predatory Strikes (effect 1)
+                                    if (Item* mainHand = m_items[EQUIPMENT_SLOT_MAINHAND])
+                                    {
+                                        // also gains % attack power from equipped weapon
+                                        ItemTemplate const* proto = mainHand->GetTemplate();
+                                        if (!proto)
+                                            continue;
 
-                                uint32 ap = proto->getFeralBonus();
-                                // Get AP Bonuses from weapon
-                                for (uint8 i = 0; i < MAX_ITEM_PROTO_STATS; ++i)
-                                {
-                                    if (i >= proto->StatsCount)
-                                        break;
+                                        uint32 ap = proto->getFeralBonus();
+                                        // Get AP Bonuses from weapon
+                                        for (uint8 i = 0; i < MAX_ITEM_PROTO_STATS; ++i)
+                                        {
+                                            if (i >= proto->StatsCount)
+                                                break;
 
-                                    if (proto->ItemStat[i].ItemStatType == ITEM_MOD_ATTACK_POWER)
-                                        ap += proto->ItemStat[i].ItemStatValue;
-                                }
+                                            if (proto->ItemStat[i].ItemStatType == ITEM_MOD_ATTACK_POWER)
+                                                ap += proto->ItemStat[i].ItemStatValue;
+                                        }
 
-                                // Get AP Bonuses from weapon spells
-                                for (uint8 i = 0; i < MAX_ITEM_PROTO_SPELLS; ++i)
-                                {
-                                    // no spell
-                                    if (!proto->Spells[i].SpellId || proto->Spells[i].SpellTrigger != ITEM_SPELLTRIGGER_ON_EQUIP)
-                                        continue;
+                                        // Get AP Bonuses from weapon spells
+                                        for (uint8 i = 0; i < MAX_ITEM_PROTO_SPELLS; ++i)
+                                        {
+                                            // no spell
+                                            if (!proto->Spells[i].SpellId || proto->Spells[i].SpellTrigger != ITEM_SPELLTRIGGER_ON_EQUIP)
+                                                continue;
 
-                                    // check if it is valid spell
-                                    SpellInfo const* spellproto = sSpellMgr->GetSpellInfo(proto->Spells[i].SpellId);
-                                    if (!spellproto)
-                                        continue;
+                                            // check if it is valid spell
+                                            SpellInfo const* spellproto = sSpellMgr->GetSpellInfo(proto->Spells[i].SpellId);
+                                            if (!spellproto)
+                                                continue;
 
-                                    for (uint8 j = 0; j < MAX_SPELL_EFFECTS; ++j)
-                                        if (spellproto->Effects[j].ApplyAuraName == SPELL_AURA_MOD_ATTACK_POWER)
-                                            ap += spellproto->Effects[j].CalcValue();
-                                }
+                                            for (uint8 j = 0; j < MAX_SPELL_EFFECTS; ++j)
+                                                if (spellproto->Effects[j].ApplyAuraName == SPELL_AURA_MOD_ATTACK_POWER)
+                                                    ap += spellproto->Effects[j].CalcValue();
+                                        }
 
-                                weapon_bonus = CalculatePct(float(ap), aurEff->GetAmount());
+                                        weapon_bonus = CalculatePct(float(ap), aurEff->GetAmount());
+                                    }
+                                    break;
+                                default:
+                                    break;
                             }
-                            break;
-                        default:
-                            break;
                         }
                     }
                 }
-            }
 
-            switch (GetShapeshiftForm())
+                switch (GetShapeshiftForm())
+                {
+                    case FORM_CAT:
+                        baseAttackPower = (GetLevel() * mLevelMult) + GetStat(STAT_STRENGTH) * 2.0f + GetStat(STAT_AGILITY) - 20.0f + weapon_bonus + m_baseFeralAP;
+                        break;
+                    case FORM_BEAR:
+                    case FORM_DIREBEAR:
+                        baseAttackPower = (GetLevel() * mLevelMult) + GetStat(STAT_STRENGTH) * 2.0f - 20.0f + weapon_bonus + m_baseFeralAP;
+                        break;
+                    case FORM_MOONKIN:
+                        baseAttackPower = (GetLevel() * mLevelMult) + GetStat(STAT_STRENGTH) * 2.0f - 20.0f + m_baseFeralAP;
+                        break;
+                    default:
+                        baseAttackPower = GetStat(STAT_STRENGTH) * 2.0f - 20.0f;
+                        break;
+                }
+            }
+            else if (IsClass(CLASS_MAGE, CLASS_CONTEXT_STATS) || IsClass(CLASS_PRIEST, CLASS_CONTEXT_STATS) || IsClass(CLASS_WARLOCK, CLASS_CONTEXT_STATS))
             {
-            case FORM_CAT:
-                val2 = (GetLevel() * mLevelMult) + GetStat(STAT_STRENGTH) * 2.0f + GetStat(STAT_AGILITY) - 20.0f + weapon_bonus + m_baseFeralAP;
-                break;
-            case FORM_BEAR:
-            case FORM_DIREBEAR:
-                val2 = (GetLevel() * mLevelMult) + GetStat(STAT_STRENGTH) * 2.0f - 20.0f + weapon_bonus + m_baseFeralAP;
-                break;
-            case FORM_MOONKIN:
-                val2 = (GetLevel() * mLevelMult) + GetStat(STAT_STRENGTH) * 2.0f - 20.0f + m_baseFeralAP;
-                break;
-            default:
-                val2 = GetStat(STAT_STRENGTH) * 2.0f - 20.0f;
-                break;
+                baseAttackPower = GetStat(STAT_STRENGTH) - 10.0f;
             }
         }
-        else if (IsClass(CLASS_MAGE, CLASS_CONTEXT_STATS) || IsClass(CLASS_PRIEST, CLASS_CONTEXT_STATS) || IsClass(CLASS_WARLOCK, CLASS_CONTEXT_STATS))
+
+        SetModifierValue(unitMod, BASE_VALUE, baseAttackPower);
+
+        float base_attPower  = GetModifierValue(unitMod, BASE_VALUE) * GetModifierValue(unitMod, BASE_PCT);
+        float attPowerMod = GetModifierValue(unitMod, TOTAL_VALUE);
+
+        //add dynamic flat mods
+        if (ranged)
         {
-            val2 = GetStat(STAT_STRENGTH) - 10.0f;
+            if ((getClassMask() & CLASSMASK_WAND_USERS) == 0)
+            {
+                AuraEffectList const& mRAPbyStat = GetAuraEffectsByType(SPELL_AURA_MOD_RANGED_ATTACK_POWER_OF_STAT_PERCENT);
+                for (AuraEffectList::const_iterator i = mRAPbyStat.begin(); i != mRAPbyStat.end(); ++i)
+                    attPowerMod += CalculatePct(GetStat(Stats((*i)->GetMiscValue())), (*i)->GetAmount());
+            }
         }
-    }
-
-    SetModifierValue(unitMod, BASE_VALUE, val2);
-
-    float base_attPower  = GetModifierValue(unitMod, BASE_VALUE) * GetModifierValue(unitMod, BASE_PCT);
-    float attPowerMod = GetModifierValue(unitMod, TOTAL_VALUE);
-
-    //add dynamic flat mods
-    if (ranged)
-    {
-        if ((getClassMask() & CLASSMASK_WAND_USERS) == 0)
+        else
         {
-            AuraEffectList const& mRAPbyStat = GetAuraEffectsByType(SPELL_AURA_MOD_RANGED_ATTACK_POWER_OF_STAT_PERCENT);
-            for (AuraEffectList::const_iterator i = mRAPbyStat.begin(); i != mRAPbyStat.end(); ++i)
+            AuraEffectList const& mAPbyStat = GetAuraEffectsByType(SPELL_AURA_MOD_ATTACK_POWER_OF_STAT_PERCENT);
+            for (AuraEffectList::const_iterator i = mAPbyStat.begin(); i != mAPbyStat.end(); ++i)
                 attPowerMod += CalculatePct(GetStat(Stats((*i)->GetMiscValue())), (*i)->GetAmount());
+
+            AuraEffectList const& mAPbyArmor = GetAuraEffectsByType(SPELL_AURA_MOD_ATTACK_POWER_OF_ARMOR);
+            for (AuraEffectList::const_iterator iter = mAPbyArmor.begin(); iter != mAPbyArmor.end(); ++iter)
+                // always: ((*i)->GetModifier()->m_miscvalue == 1 == SPELL_SCHOOL_MASK_NORMAL)
+                    attPowerMod += int32(GetArmor() / (*iter)->GetAmount());
         }
-    }
-    else
-    {
-        AuraEffectList const& mAPbyStat = GetAuraEffectsByType(SPELL_AURA_MOD_ATTACK_POWER_OF_STAT_PERCENT);
-        for (AuraEffectList::const_iterator i = mAPbyStat.begin(); i != mAPbyStat.end(); ++i)
-            attPowerMod += CalculatePct(GetStat(Stats((*i)->GetMiscValue())), (*i)->GetAmount());
 
-        AuraEffectList const& mAPbyArmor = GetAuraEffectsByType(SPELL_AURA_MOD_ATTACK_POWER_OF_ARMOR);
-        for (AuraEffectList::const_iterator iter = mAPbyArmor.begin(); iter != mAPbyArmor.end(); ++iter)
-            // always: ((*i)->GetModifier()->m_miscvalue == 1 == SPELL_SCHOOL_MASK_NORMAL)
-            attPowerMod += int32(GetArmor() / (*iter)->GetAmount());
-    }
+        float attPowerMultiplier = GetModifierValue(unitMod, TOTAL_PCT) - 1.0f;
 
-    float attPowerMultiplier = GetModifierValue(unitMod, TOTAL_PCT) - 1.0f;
+        sScriptMgr->OnPlayerAfterUpdateAttackPowerAndDamage(this, level, base_attPower, attPowerMod, attPowerMultiplier, ranged);
+        SetInt32Value(index, (uint32)base_attPower);            //UNIT_FIELD_(RANGED)_ATTACK_POWER field
+        SetInt32Value(index_mod, (uint32)attPowerMod);          //UNIT_FIELD_(RANGED)_ATTACK_POWER_MODS field
+        SetFloatValue(index_mult, attPowerMultiplier);          //UNIT_FIELD_(RANGED)_ATTACK_POWER_MULTIPLIER field
 
-    sScriptMgr->OnPlayerAfterUpdateAttackPowerAndDamage(this, level, base_attPower, attPowerMod, attPowerMultiplier, ranged);
-    SetInt32Value(index, (uint32)base_attPower);            //UNIT_FIELD_(RANGED)_ATTACK_POWER field
-    SetInt32Value(index_mod, (uint32)attPowerMod);          //UNIT_FIELD_(RANGED)_ATTACK_POWER_MODS field
-    SetFloatValue(index_mult, attPowerMultiplier);          //UNIT_FIELD_(RANGED)_ATTACK_POWER_MULTIPLIER field
-
-    //automatically update weapon damage after attack power modification
-    if (ranged)
-    {
-        UpdateDamagePhysical(RANGED_ATTACK);
-    }
-    else
-    {
-        UpdateDamagePhysical(BASE_ATTACK);
-        if (CanDualWield() && HasOffhandWeaponForAttack()) //allow update offhand damage only if player knows DualWield Spec and has equipped offhand weapon
-            UpdateDamagePhysical(OFF_ATTACK);
-        if (IsClass(CLASS_SHAMAN, CLASS_CONTEXT_STATS) || IsClass(CLASS_PALADIN, CLASS_CONTEXT_STATS))                      // mental quickness
-            UpdateSpellDamageAndHealingBonus();
+        //automatically update weapon damage after attack power modification
+        if (ranged)
+        {
+            UpdateDamagePhysical(RANGED_ATTACK);
+        }
+        else
+        {
+            UpdateDamagePhysical(BASE_ATTACK);
+            if (CanDualWield() && HasOffhandWeaponForAttack()) //allow update offhand damage only if player knows DualWield Spec and has equipped offhand weapon
+                UpdateDamagePhysical(OFF_ATTACK);
+            if (IsClass(CLASS_SHAMAN, CLASS_CONTEXT_STATS) || IsClass(CLASS_PALADIN, CLASS_CONTEXT_STATS))                      // mental quickness
+                UpdateSpellDamageAndHealingBonus();
+        }
     }
 }
 
