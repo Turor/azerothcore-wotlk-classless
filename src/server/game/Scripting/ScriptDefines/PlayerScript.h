@@ -211,6 +211,7 @@ enum PlayerHook
     PLAYERHOOK_ON_CAN_GIVE_LEVEL,
     PLAYERHOOK_ON_SEND_LIST_INVENTORY,
     PLAYERHOOK_ON_GIVE_REPUTATION,
+    PLAYERHOOK_ON_UPDATE_ATTACK_POWER_AND_DAMAGE_REPLACE_WITH_ALTERNATIVE_CALCULATION,
     PLAYERHOOK_END
 };
 
@@ -324,7 +325,9 @@ public:
     virtual void OnPlayerSpellCast(Player* /*player*/, Spell* /*spell*/, bool /*skipCheck*/) { }
 
     // Called during data loading
-    virtual void OnPlayerLoadFromDB(Player* /*player*/) { };
+    virtual void OnPlayerLoadFromDB(Player* /*player*/) { }
+
+    virtual bool OnUpdateAttackPowerAndDamageReplaceWithAlternativeCalculation(Player * player, bool ranged) {return false;}
 
     // Called when a player logs in.
     virtual void OnPlayerLogin(Player* /*player*/) { }
@@ -453,7 +456,7 @@ public:
     virtual void OnPlayerBeforeDurabilityRepair(Player* /*player*/, ObjectGuid /*npcGUID*/, ObjectGuid /*itemGUID*/, float&/*discountMod*/, uint8 /*guildBank*/) { }
 
     //Before buying something from any vendor
-    virtual void OnPlayerBeforeBuyItemFromVendor(Player* /*player*/, ObjectGuid /*vendorguid*/, uint32 /*vendorslot*/, uint32& /*item*/, uint8 /*count*/, uint8 /*bag*/, uint8 /*slot*/) { };
+    virtual void OnPlayerBeforeBuyItemFromVendor(Player* /*player*/, ObjectGuid /*vendorguid*/, uint32 /*vendorslot*/, uint32& /*item*/, uint8 /*count*/, uint8 /*bag*/, uint8 /*slot*/) { }
 
     //Before buying something from any vendor
     virtual void OnPlayerBeforeStoreOrEquipNewItem(Player* /*player*/, uint32 /*vendorslot*/, uint32& /*item*/, uint8 /*count*/, uint8 /*bag*/, uint8 /*slot*/, ItemTemplate const* /*pProto*/, Creature* /*pVendor*/, VendorItem const* /*crItem*/, bool /*bStore*/) { };
