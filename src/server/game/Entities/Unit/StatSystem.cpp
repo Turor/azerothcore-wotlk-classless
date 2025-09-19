@@ -346,10 +346,10 @@ void Player::ApplyFeralAPBonus(int32 amount, bool apply)
 
 void Player::UpdateAttackPowerAndDamage(bool ranged)
 {
-    float val2 = 0.0f;
+    float baseAttackPower = 0.0f;
     float level = float(GetLevel());
 
-    sScriptMgr->OnPlayerBeforeUpdateAttackPowerAndDamage(this, level, val2, ranged);
+    sScriptMgr->OnPlayerBeforeUpdateAttackPowerAndDamage(this, level, baseAttackPower, ranged);
 
     UnitMods unitMod = ranged ? UNIT_MOD_ATTACK_POWER_RANGED : UNIT_MOD_ATTACK_POWER;
 
@@ -363,13 +363,14 @@ void Player::UpdateAttackPowerAndDamage(bool ranged)
         index_mod = UNIT_FIELD_RANGED_ATTACK_POWER_MODS;
         index_mult = UNIT_FIELD_RANGED_ATTACK_POWER_MULTIPLIER;
 
+        // CLASSLESS MODIFICATION
         if (IsClass(CLASS_HUNTER, CLASS_CONTEXT_STATS))
         {
-            val2 = level * 2.0f + GetStat(STAT_AGILITY) - 10.0f;
+            baseAttackPower = level * 2.0f + GetStat(STAT_AGILITY) - 10.0f;
         }
         else if (IsClass(CLASS_ROGUE, CLASS_CONTEXT_STATS) || IsClass(CLASS_WARRIOR, CLASS_CONTEXT_STATS))
         {
-            val2 = level + GetStat(STAT_AGILITY) - 10.0f;
+            baseAttackPower = level + GetStat(STAT_AGILITY) - 10.0f;
         }
         else if (IsClass(CLASS_DRUID, CLASS_CONTEXT_STATS))
         {
@@ -378,27 +379,27 @@ void Player::UpdateAttackPowerAndDamage(bool ranged)
             case FORM_CAT:
             case FORM_BEAR:
             case FORM_DIREBEAR:
-                val2 = 0.0f;
+                baseAttackPower = 0.0f;
                 break;
             default:
-                val2 = GetStat(STAT_AGILITY) - 10.0f;
+                baseAttackPower = GetStat(STAT_AGILITY) - 10.0f;
                 break;
             }
         }
         else
         {
-            val2 = GetStat(STAT_AGILITY) - 10.0f;
+            baseAttackPower = GetStat(STAT_AGILITY) - 10.0f;
         }
     }
     else
     {
         if (IsClass(CLASS_PALADIN, CLASS_CONTEXT_STATS) || IsClass(CLASS_DEATH_KNIGHT, CLASS_CONTEXT_STATS) || IsClass(CLASS_WARRIOR, CLASS_CONTEXT_STATS))
         {
-            val2 = level * 3.0f + GetStat(STAT_STRENGTH) * 2.0f - 20.0f;
+            baseAttackPower = level * 3.0f + GetStat(STAT_STRENGTH) * 2.0f - 20.0f;
         }
         else if (IsClass(CLASS_HUNTER, CLASS_CONTEXT_STATS) || IsClass(CLASS_SHAMAN, CLASS_CONTEXT_STATS) || IsClass(CLASS_ROGUE, CLASS_CONTEXT_STATS))
         {
-            val2 = level * 2.0f + GetStat(STAT_STRENGTH) + GetStat(STAT_AGILITY) - 20.0f;
+            baseAttackPower = level * 2.0f + GetStat(STAT_STRENGTH) + GetStat(STAT_AGILITY) - 20.0f;
         }
         else if (IsClass(CLASS_DRUID, CLASS_CONTEXT_STATS))
         {
@@ -467,27 +468,27 @@ void Player::UpdateAttackPowerAndDamage(bool ranged)
             switch (GetShapeshiftForm())
             {
             case FORM_CAT:
-                val2 = (GetLevel() * mLevelMult) + GetStat(STAT_STRENGTH) * 2.0f + GetStat(STAT_AGILITY) - 20.0f + weapon_bonus + m_baseFeralAP;
+                baseAttackPower = (GetLevel() * mLevelMult) + GetStat(STAT_STRENGTH) * 2.0f + GetStat(STAT_AGILITY) - 20.0f + weapon_bonus + m_baseFeralAP;
                 break;
             case FORM_BEAR:
             case FORM_DIREBEAR:
-                val2 = (GetLevel() * mLevelMult) + GetStat(STAT_STRENGTH) * 2.0f - 20.0f + weapon_bonus + m_baseFeralAP;
+                baseAttackPower = (GetLevel() * mLevelMult) + GetStat(STAT_STRENGTH) * 2.0f - 20.0f + weapon_bonus + m_baseFeralAP;
                 break;
             case FORM_MOONKIN:
-                val2 = (GetLevel() * mLevelMult) + GetStat(STAT_STRENGTH) * 2.0f - 20.0f + m_baseFeralAP;
+                baseAttackPower = (GetLevel() * mLevelMult) + GetStat(STAT_STRENGTH) * 2.0f - 20.0f + m_baseFeralAP;
                 break;
             default:
-                val2 = GetStat(STAT_STRENGTH) * 2.0f - 20.0f;
+                baseAttackPower = GetStat(STAT_STRENGTH) * 2.0f - 20.0f;
                 break;
             }
         }
         else if (IsClass(CLASS_MAGE, CLASS_CONTEXT_STATS) || IsClass(CLASS_PRIEST, CLASS_CONTEXT_STATS) || IsClass(CLASS_WARLOCK, CLASS_CONTEXT_STATS))
         {
-            val2 = GetStat(STAT_STRENGTH) - 10.0f;
+            baseAttackPower = GetStat(STAT_STRENGTH) - 10.0f;
         }
     }
 
-    SetModifierValue(unitMod, BASE_VALUE, val2);
+    SetModifierValue(unitMod, BASE_VALUE, baseAttackPower);
 
     float base_attPower  = GetModifierValue(unitMod, BASE_VALUE) * GetModifierValue(unitMod, BASE_PCT);
     float attPowerMod = GetModifierValue(unitMod, TOTAL_VALUE);
@@ -530,7 +531,7 @@ void Player::UpdateAttackPowerAndDamage(bool ranged)
     {
         UpdateDamagePhysical(BASE_ATTACK);
         if (CanDualWield() && HasOffhandWeaponForAttack()) //allow update offhand damage only if player knows DualWield Spec and has equipped offhand weapon
-            UpdateDamagePhysical(OFF_ATTACK);
+            UpdateDamagePhysical(OFF_ATTACK);// // CLASSLESS MODIFICATion
         if (IsClass(CLASS_SHAMAN, CLASS_CONTEXT_STATS) || IsClass(CLASS_PALADIN, CLASS_CONTEXT_STATS))                      // mental quickness
             UpdateSpellDamageAndHealingBonus();
     }
