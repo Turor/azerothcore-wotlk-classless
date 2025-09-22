@@ -13969,6 +13969,10 @@ void Player::CompletedAchievement(AchievementEntry const* entry)
 
 void Player::LearnTalent(uint32 talentId, uint32 talentRank, bool command /*= false*/)
 {
+    bool usingAlternativeLearnTalent = sScriptMgr->OnPlayerLearnTalentUseAlternativeLogic(this, talentId, talentRank, command);
+    if (usingAlternativeLearnTalent)
+        return;
+
     uint32 CurTalentPoints = GetFreeTalentPoints();
 
     if (!command)

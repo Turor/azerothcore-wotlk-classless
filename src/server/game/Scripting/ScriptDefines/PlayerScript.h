@@ -212,6 +212,7 @@ enum PlayerHook
     PLAYERHOOK_ON_SEND_LIST_INVENTORY,
     PLAYERHOOK_ON_GIVE_REPUTATION,
     PLAYERHOOK_ON_UPDATE_ATTACK_POWER_AND_DAMAGE_REPLACE_WITH_ALTERNATIVE_CALCULATION,
+    PLAYERHOOK_ON_LEARN_TALENT_USE_ALTERNATIVE_LOGIC,
     PLAYERHOOK_END
 };
 
@@ -712,6 +713,16 @@ public:
      * @param spellid Contains information about the spell id
      */
     virtual void OnPlayerLearnTalents(Player* /*player*/, uint32 /*talentId*/, uint32 /*talentRank*/, uint32 /*spellid*/) { }
+
+    /**
+     * @brief Used to provide an alternative method of learning talents
+     *
+     * @param player Contains information about the Player
+     * @param talentId Contains information about the talent id
+     * @param talentRank Contains information about the talent rank
+     * @param command Whether this learning of talents was caused by a command
+     */
+    virtual bool OnPlayerLearnTalentUseAlternativeLogic(Player* player, uint32 talentId, uint32 talentRank, bool command /*= false*/) {return false;}
 
     /**
      * @brief This hook called after player entering combat

@@ -936,6 +936,12 @@ bool ScriptMgr::OnUpdateAttackPowerAndDamageReplaceWithAlternativeCalculation(Pl
         script->OnUpdateAttackPowerAndDamageReplaceWithAlternativeCalculation(player,ranged));
 }
 
+bool ScriptMgr::OnPlayerLearnTalentUseAlternativeLogic(Player* player, uint32 talentId, uint32 talentRank, bool command /*= false*/)
+{
+    CALL_ENABLED_BOOLEAN_HOOKS_WITH_DEFAULT_FALSE(PlayerScript, PLAYERHOOK_ON_LEARN_TALENT_USE_ALTERNATIVE_LOGIC,
+        script->OnPlayerLearnTalentUseAlternativeLogic(player,talentId,talentRank,command));
+}
+
 PlayerScript::PlayerScript(const char* name, std::vector<uint16> enabledHooks)
     : ScriptObject(name, PLAYERHOOK_END)
 {
