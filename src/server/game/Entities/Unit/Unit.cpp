@@ -16166,61 +16166,66 @@ void Unit::ProcDamageAndSpellFor(bool isVictim, Unit* target, uint32 procFlag, u
                 ToPlayer()->UpdateCombatSkills(target, attType, true);
             }
         }
-        // If exist crit/parry/dodge/block need update aura state (for victim and attacker)
-        if (procExtra & (PROC_EX_CRITICAL_HIT | PROC_EX_PARRY | PROC_EX_DODGE | PROC_EX_BLOCK))
+
+        bool customProcScriptExists = sScriptMgr->OnExtraProcHandleReactionStates(this, procExtra & (PROC_EX_CRITICAL_HIT | PROC_EX_PARRY | PROC_EX_DODGE | PROC_EX_BLOCK));
+        if (!customProcScriptExists)
         {
-            // for victim
-            if (isVictim)
+            // If exist crit/parry/dodge/block need update aura state (for victim and attacker)
+            if (procExtra & (PROC_EX_CRITICAL_HIT | PROC_EX_PARRY | PROC_EX_DODGE | PROC_EX_BLOCK))
             {
-                // if victim and dodge attack
-                if (procExtra & PROC_EX_DODGE)
+                // for victim
+                if (isVictim)
                 {
-                    // Update AURA_STATE on dodge
-                    if (!IsClass(CLASS_ROGUE, CLASS_CONTEXT_ABILITY_REACTIVE)) // skip Rogue Riposte
+                    // if victim and dodge attack
+                    if (procExtra & PROC_EX_DODGE)
+                    {
+                        // Update AURA_STATE on dodge
+                        if (!IsClass(CLASS_ROGUE, CLASS_CONTEXT_ABILITY_REACTIVE)) // skip Rogue Riposte
+                        {
+                            ModifyAuraState(AURA_STATE_DEFENSE, true);
+                            StartReactiveTimer(REACTIVE_DEFENSE);
+                        }
+                    }
+                    // if victim and parry attack
+                    if (procExtra & PROC_EX_PARRY)
+                    {
+                        // For Hunters only Counterattack (skip Mongoose bite)
+                        if (IsClass(CLASS_HUNTER, CLASS_CONTEXT_ABILITY_REACTIVE))
+                        {
+                            ModifyAuraState(AURA_STATE_HUNTER_PARRY, true);
+                            StartReactiveTimer(REACTIVE_HUNTER_PARRY);
+                        }
+                        else
+                        {
+                            ModifyAuraState(AURA_STATE_DEFENSE, true);
+                            StartReactiveTimer(REACTIVE_DEFENSE);
+                        }
+                    }
+                    // if and victim block attack
+                    if (procExtra & PROC_EX_BLOCK)
                     {
                         ModifyAuraState(AURA_STATE_DEFENSE, true);
                         StartReactiveTimer(REACTIVE_DEFENSE);
                     }
                 }
-                // if victim and parry attack
-                if (procExtra & PROC_EX_PARRY)
+                else // For attacker
                 {
-                    // For Hunters only Counterattack (skip Mongoose bite)
-                    if (IsClass(CLASS_HUNTER, CLASS_CONTEXT_ABILITY_REACTIVE))
+                    // Overpower on victim dodge
+                    if (procExtra & PROC_EX_DODGE)
                     {
-                        ModifyAuraState(AURA_STATE_HUNTER_PARRY, true);
-                        StartReactiveTimer(REACTIVE_HUNTER_PARRY);
+                        if (IsClass(CLASS_WARRIOR, CLASS_CONTEXT_ABILITY_REACTIVE))
+                        {
+                            AddComboPoints(target, 1);
+                            StartReactiveTimer(REACTIVE_OVERPOWER);
+                        }
                     }
-                    else
-                    {
-                        ModifyAuraState(AURA_STATE_DEFENSE, true);
-                        StartReactiveTimer(REACTIVE_DEFENSE);
-                    }
-                }
-                // if and victim block attack
-                if (procExtra & PROC_EX_BLOCK)
-                {
-                    ModifyAuraState(AURA_STATE_DEFENSE, true);
-                    StartReactiveTimer(REACTIVE_DEFENSE);
-                }
-            }
-            else // For attacker
-            {
-                // Overpower on victim dodge
-                if (procExtra & PROC_EX_DODGE)
-                {
-                    if (IsClass(CLASS_WARRIOR, CLASS_CONTEXT_ABILITY_REACTIVE))
+
+                    // Wolverine Bite
+                    if ((procExtra & PROC_HIT_CRITICAL) && IsHunterPet())
                     {
                         AddComboPoints(target, 1);
-                        StartReactiveTimer(REACTIVE_OVERPOWER);
+                        StartReactiveTimer(REACTIVE_WOLVERINE_BITE);
                     }
-                }
-
-                // Wolverine Bite
-                if ((procExtra & PROC_HIT_CRITICAL) && IsHunterPet())
-                {
-                    AddComboPoints(target, 1);
-                    StartReactiveTimer(REACTIVE_WOLVERINE_BITE);
                 }
             }
         }

@@ -40,6 +40,7 @@
 
 // Add support old api modules
 #include "AllScriptsObjects.h"
+#include "SpellMgr.h"
 
 class AuctionHouseObject;
 class AuraScript;
@@ -453,6 +454,7 @@ public: /* PlayerScript */
     bool OnPlayerCanUseChat(Player* player, uint32 type, uint32 language, std::string& msg, Guild* guild);
     bool OnPlayerCanUseChat(Player* player, uint32 type, uint32 language, std::string& msg, Channel* channel);
     void OnPlayerLearnTalents(Player* player, uint32 talentId, uint32 talentRank, uint32 spellid);
+    bool OnPlayerLearnTalentUseAlternativeLogic(Player *player, uint32 talentId, uint32 talentRank, bool command);
     void OnPlayerEnterCombat(Player* player, Unit* enemy);
     void OnPlayerLeaveCombat(Player* player);
     void OnPlayerQuestAbandon(Player* player, uint32 questId);
@@ -475,6 +477,9 @@ public: /* PlayerScript */
     void AnticheatSetJumpingbyOpcode(Player* player, bool jump);
     bool AnticheatHandleDoubleJump(Player* player, Unit* mover);
     bool AnticheatCheckMovementInfo(Player* player, MovementInfo const& movementInfo, Unit* mover, bool jump);
+
+public: /* StatSystemScript */
+    bool OnUpdateAttackPowerAndDamageReplaceWithAlternativeCalculation(Player* player, bool ranged);
 
 public: /* AccountScript */
     void OnAccountLogin(uint32 accountId);
@@ -564,6 +569,7 @@ public: /* UnitScript */
     void OnUnitEnterCombat(Unit* unit, Unit* victim);
     void OnUnitDeath(Unit* unit, Unit* killer);
     void OnUnitSetShapeshiftForm(Unit* unit, uint8 form);
+    bool OnExtraProcHandleReactionStates(Unit* unit, uint32 procs);
 
 public: /* MovementHandlerScript */
     void OnPlayerMove(Player* player, MovementInfo movementInfo, uint32 opcode);
