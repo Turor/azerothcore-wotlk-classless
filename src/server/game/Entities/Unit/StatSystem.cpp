@@ -312,6 +312,10 @@ void Player::ApplyFeralAPBonus(int32 amount, bool apply) {
 }
 
 void Player::UpdateAttackPowerAndDamage(bool ranged) {
+    bool usingAlternativeAttackPowerAndDamage = sScriptMgr->OnUpdateAttackPowerAndDamageReplaceWithAlternativeCalculation(this, ranged);
+    if (usingAlternativeAttackPowerAndDamage)
+        return;
+
     float baseAttackPower = 0.0f;
     float level = float(GetLevel());
 
