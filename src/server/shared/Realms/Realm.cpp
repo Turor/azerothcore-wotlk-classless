@@ -20,6 +20,8 @@
 #include <boost/asio/ip/tcp.hpp>
 #include <memory> // NOTE: this import is NEEDED (even though some IDEs report it as unused)
 
+#include "Log.h"
+
 boost::asio::ip::tcp_endpoint Realm::GetAddressForClient(boost::asio::ip::address const& clientAddr) const
 {
     boost::asio::ip::address realmIp;
@@ -50,6 +52,8 @@ boost::asio::ip::tcp_endpoint Realm::GetAddressForClient(boost::asio::ip::addres
             realmIp = *ExternalAddress;
         }
     }
+
+    LOG_DEBUG("server.authserver", "Returned Realm Address: %s,%u", realmIp.to_string(), Port);
 
     // Return external IP
     return { realmIp, Port };
