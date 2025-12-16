@@ -53,7 +53,7 @@ boost::asio::ip::tcp_endpoint Realm::GetAddressForClient(boost::asio::ip::addres
         }
     }
 
-    LOG_DEBUG("server.authserver", "Returned Realm Address: %s,%u", realmIp.to_string(), Port);
+    LOG_DEBUG("server.authserver", "Returned Realm Address: {},{}", realmIp.to_string(), Port);
 
     // Return external IP
     return { realmIp, Port };
