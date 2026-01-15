@@ -475,6 +475,9 @@ public: /* PlayerScript */
 
 public: /* StatSystemScript */
     bool OnUpdateAttackPowerAndDamageReplaceWithAlternativeCalculation(Player* player, bool ranged);
+    bool OnPlayerUpdateParryUseAlternative(Player* player);
+    bool OnPlayerUpdateDodgeUseAlternative(Player* player);
+
 
 public: /* AccountScript */
     void OnAccountLogin(uint32 accountId);
@@ -561,7 +564,7 @@ public: /* UnitScript */
     void OnUnitEnterCombat(Unit* unit, Unit* victim);
     void OnUnitDeath(Unit* unit, Unit* killer);
     void OnUnitSetShapeshiftForm(Unit* unit, uint8 form);
-    bool OnExtraProcHandleReactionStates(Unit* unit, uint32 procs);
+    bool OnExtraProcHandleReactionStates(Unit* unit, Unit* target, bool isVictim, uint32 procs);
 
 public: /* MovementHandlerScript */
     void OnPlayerMove(Player* player, MovementInfo movementInfo, uint32 opcode);

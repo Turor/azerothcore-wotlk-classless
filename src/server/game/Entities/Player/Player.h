@@ -1943,6 +1943,7 @@ public:
     void UpdateMaxHealth() override;
     void UpdateMaxPower(Powers power) override;
     void ApplyFeralAPBonus(int32 amount, bool apply);
+    uint32 GetFeralAPBonus() const { return m_baseFeralAP;}
     void UpdateAttackPowerAndDamage(bool ranged = false) override;
     void UpdateShieldBlockValue();
     void ApplySpellPowerBonus(int32 amount, bool apply);
@@ -2615,7 +2616,9 @@ public:
     void SetMountBlockId(uint32 mount) { m_MountBlockId = mount; }
 
     [[nodiscard]] float GetRealParry() const { return m_realParry; }
+    void SetRealParry(float parry) { m_realParry = parry; }
     [[nodiscard]] float GetRealDodge() const { return m_realDodge; }
+    void SetRealDodge(float dodge) { m_realDodge = dodge; }
     // mt maps
     [[nodiscard]] const PlayerTalentMap& GetTalentMap() const { return m_talents; }
     [[nodiscard]] uint32 GetNextSave() const { return m_nextSave; }

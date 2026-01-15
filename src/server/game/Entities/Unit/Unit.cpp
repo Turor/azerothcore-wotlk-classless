@@ -16300,7 +16300,7 @@ void Unit::ProcDamageAndSpellFor(bool isVictim, Unit* target, uint32 procFlag, u
             }
         }
 
-        bool customProcScriptExists = sScriptMgr->OnExtraProcHandleReactionStates(this, procExtra & (PROC_EX_CRITICAL_HIT | PROC_EX_PARRY | PROC_EX_DODGE | PROC_EX_BLOCK));
+        bool customProcScriptExists = sScriptMgr->OnExtraProcHandleReactionStates(this, target, isVictim, procExtra & (PROC_EX_CRITICAL_HIT | PROC_EX_PARRY | PROC_EX_DODGE | PROC_EX_BLOCK));
         if (!customProcScriptExists)
         {
             // If exist crit/parry/dodge/block need update aura state (for victim and attacker)

@@ -917,6 +917,18 @@ bool ScriptMgr::OnPlayerLearnTalentUseAlternativeLogic(Player* player, uint32 ta
         script->OnPlayerLearnTalentUseAlternativeLogic(player,talentId,talentRank,command));
 }
 
+bool ScriptMgr::OnPlayerUpdateDodgeUseAlternative(Player *player)
+{
+    CALL_ENABLED_BOOLEAN_HOOKS_WITH_DEFAULT_FALSE(PlayerScript, PLAYERHOOK_ON_LEARN_TALENT_USE_ALTERNATIVE_LOGIC,
+        script->OnPlayerUpdateDodgeUseAlternative(player));
+}
+
+bool ScriptMgr::OnPlayerUpdateParryUseAlternative(Player *player)
+{
+    CALL_ENABLED_BOOLEAN_HOOKS_WITH_DEFAULT_FALSE(PlayerScript, PLAYERHOOK_ON_LEARN_TALENT_USE_ALTERNATIVE_LOGIC,
+        script->OnPlayerUpdateParryUseAlternative(player));
+}
+
 PlayerScript::PlayerScript(const char* name, std::vector<uint16> enabledHooks)
     : ScriptObject(name, PLAYERHOOK_END)
 {

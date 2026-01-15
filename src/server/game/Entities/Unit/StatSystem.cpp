@@ -688,6 +688,10 @@ float Player::GetMissPercentageFromDefence() const {
 }
 
 void Player::UpdateParryPercentage() {
+    bool usingAlternativeParryCalculation = sScriptMgr->OnPlayerUpdateParryUseAlternative(this);
+    if (usingAlternativeParryCalculation)
+        return;
+
     const float parry_cap[MAX_CLASSES] =
     {
         47.003525f, // Warrior
@@ -734,6 +738,10 @@ void Player::UpdateParryPercentage() {
 }
 
 void Player::UpdateDodgePercentage() {
+    bool usingAlternativeDodgeCalculation = sScriptMgr->OnPlayerUpdateDodgeUseAlternative(this);
+    if (usingAlternativeDodgeCalculation)
+        return;
+
     const float dodge_cap[MAX_CLASSES] =
     {
         88.129021f, // Warrior

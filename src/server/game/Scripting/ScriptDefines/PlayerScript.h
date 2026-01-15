@@ -315,6 +315,20 @@ public:
 
     virtual bool OnUpdateAttackPowerAndDamageReplaceWithAlternativeCalculation(Player * player, bool ranged) {return false;}
 
+    /**
+     * @brief Used to provide an alternative method of calculating parry chance for a player
+     * @param player Contains information about the player
+     * @return Whether this alternative calculation was applied
+     */
+    virtual bool OnPlayerUpdateParryUseAlternative(Player* player) {return false;}
+
+    /**
+     * @brief Used to provide an alternative method of calculating dodge chance for a player
+     * @param player Contains information about the player
+     * @return Whether this alternative calculation was applied
+     */
+    virtual bool OnPlayerUpdateDodgeUseAlternative(Player* player) {return false;}
+
     // Called when a player logs in.
     virtual void OnPlayerLogin(Player* /*player*/) { }
 

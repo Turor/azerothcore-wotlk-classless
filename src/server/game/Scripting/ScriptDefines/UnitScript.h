@@ -109,7 +109,7 @@ public:
     virtual void OnUnitEnterCombat(Unit* /*unit*/, Unit* /*victim*/) { }
     virtual void OnUnitDeath(Unit* /*unit*/, Unit* /*killer*/) { }
     virtual void OnUnitSetShapeshiftForm(Unit* /*unit*/, uint8 /*form*/) { }
-    virtual bool OnExtraProcHandleReactionStates(Unit* /*unit*/, uint32 /*reactionState*/) { return false; }
+    virtual bool OnExtraProcHandleReactionStates(Unit* /*unit*/, Unit* /*target*/, bool /*isVictim*/, uint32 /*reactionState*/) { return false; }
 };
 
 #endif
