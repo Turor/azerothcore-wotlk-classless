@@ -1,0 +1,7 @@
+[submodule "modules/mod-ale"]
+	path = modules/mod-ale
+	url = https://github.com/azerothcore/mod-ale.git
+
+[submodule "modules/mod-classless"]
+    path = modules/mod-classless
+    url = https://github.com/Turor/mod-classless.git
