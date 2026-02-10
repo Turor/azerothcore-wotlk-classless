@@ -314,21 +314,21 @@ public:
     // Called during data loading
     virtual void OnPlayerLoadFromDB(Player* /*player*/) { }
 
-    virtual bool OnUpdateAttackPowerAndDamageReplaceWithAlternativeCalculation(Player * player, bool ranged) {return false;}
+    virtual bool OnUpdateAttackPowerAndDamageReplaceWithAlternativeCalculation(Player * /*player*/, bool /*ranged*/) {return false;}
 
     /**
      * @brief Used to provide an alternative method of calculating parry chance for a player
      * @param player Contains information about the player
      * @return Whether this alternative calculation was applied
      */
-    virtual bool OnPlayerUpdateParryUseAlternative(Player* player) {return false;}
+     virtual bool OnPlayerUpdateParryUseAlternative(Player* /*player*/) {return false;}
 
-    /**
-     * @brief Used to provide an alternative method of calculating dodge chance for a player
-     * @param player Contains information about the player
-     * @return Whether this alternative calculation was applied
-     */
-    virtual bool OnPlayerUpdateDodgeUseAlternative(Player* player) {return false;}
+     /**
+      * @brief Used to provide an alternative method of calculating dodge chance for a player
+      * @param player Contains information about the player
+      * @return Whether this alternative calculation was applied
+      */
+    virtual bool OnPlayerUpdateDodgeUseAlternative(Player* /*player*/) {return false;}
 
     // Called when a player logs in.
     virtual void OnPlayerLogin(Player* /*player*/) { }
@@ -725,7 +725,7 @@ public:
      * @param talentRank Contains information about the talent rank
      * @param command Whether this learning of talents was caused by a command
      */
-    virtual bool OnPlayerLearnTalentUseAlternativeLogic(Player* player, uint32 talentId, uint32 talentRank, bool command /*= false*/) {return false;}
+    virtual bool OnPlayerLearnTalentUseAlternativeLogic(Player* /*player*/, uint32 /*talentId*/, uint32 /*talentRank*/, bool /*command /*= false*/) {return false;}
 
     /**
      * @brief This hook called after player entering combat
