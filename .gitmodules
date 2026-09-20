@@ -1,7 +1,12 @@
 [submodule "modules/mod-ale"]
 	path = modules/mod-ale
-	url = https://github.com/azerothcore/mod-ale.git
-
+	url = https://github.com/Turor/mod-ale.git
 [submodule "modules/mod-classless"]
-    path = modules/mod-classless
-    url = https://github.com/Turor/mod-classless.git
+	path = modules/mod-classless
+	url = https://github.com/Turor/mod-classless.git
+[submodule "modules/mod-dungeonmaster"]
+	path = modules/mod-dungeonmaster
+	url = https://github.com/Turor/mod-dungeonmaster.git
+[submodule "modules/mod-ah-bot-plus"]
+	path = modules/mod-ah-bot-plus
+	url = https://github.com/Turor/mod-ah-bot-plus.git

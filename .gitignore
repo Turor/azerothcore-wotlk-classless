@@ -10,6 +10,10 @@
 !/modules/CMakeLists.txt
 !/modules/*.h
 !/modules/*.cmake
+!/modules/mod-ale
+!/modules/mod-classless
+!/modules/mod-dungeonmaster
+!/modules/mod-ah-bot-plus
 /build*/
 /var/*
 !/var/build/.gitkeep
