@@ -10,3 +10,6 @@
 [submodule "modules/mod-ah-bot-plus"]
 	path = modules/mod-ah-bot-plus
 	url = https://github.com/Turor/mod-ah-bot-plus.git
+[submodule "modules/mod-starter-guild"]
+	path = modules/mod-starter-guild
+	url = https://github.com/Turor/mod-starter-guild.git
