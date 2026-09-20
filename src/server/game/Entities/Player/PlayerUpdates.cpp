@@ -30,6 +30,7 @@
 #include "OutdoorPvPMgr.h"
 #include "Pet.h"
 #include "Player.h"
+#include "DatabaseEnv.h"
 #include "ScriptMgr.h"
 #include "SkillDiscovery.h"
 #include "SpellAuraEffects.h"
@@ -336,6 +337,35 @@ void Player::Update(uint32 p_time)
         {
             m_nextSave -= p_time;
         }
+    }
+
+    if (m_additionalSaveTimer)
+    {
+        if (p_time >= m_additionalSaveTimer)
+        {
+            CharacterDatabaseTransaction trans = CharacterDatabase.BeginTransaction();
+            if (m_additionalSaveMask & ADDITIONAL_SAVING_INVENTORY_AND_GOLD)
+                SaveInventoryAndGoldToDB(trans);
+            if (m_additionalSaveMask & ADDITIONAL_SAVING_QUEST_STATUS)
+            {
+                _SaveQuestStatus(trans);
+                _SaveDailyQuestStatus(trans);
+                _SaveWeeklyQuestStatus(trans);
+                _SaveSeasonalQuestStatus(trans);
+                _SaveMonthlyQuestStatus(trans);
+            }
+            if (m_additionalSaveMask & ADDITIONAL_SAVING_SPELLS_AND_TALENTS)
+            {
+                _SaveTalents(trans);
+                _SaveSpells(trans);
+                _SaveGlyphs(trans);
+            }
+            CharacterDatabase.CommitTransaction(trans);
+            m_additionalSaveTimer = 0;
+            m_additionalSaveMask = 0;
+        }
+        else
+            m_additionalSaveTimer -= p_time;
     }
 
     // Handle Water/drowning

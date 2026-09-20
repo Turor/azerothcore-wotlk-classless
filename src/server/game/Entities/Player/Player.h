@@ -987,6 +987,7 @@ enum AdditionalSaving
     ADDITIONAL_SAVING_NONE                      = 0x00,
     ADDITIONAL_SAVING_INVENTORY_AND_GOLD        = 0x01,
     ADDITIONAL_SAVING_QUEST_STATUS              = 0x02,
+    ADDITIONAL_SAVING_SPELLS_AND_TALENTS        = 0x04,
 };
 
 enum PlayerCommandStates
