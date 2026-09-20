@@ -1858,6 +1858,8 @@ public:
     void SendInitialActionButtons() const { SendActionButtons(1); }
     void SendActionButtons(uint32 state) const;
     bool IsActionButtonDataValid(uint8 button, uint32 action, uint8 type);
+    uint32 ResolveActionButtonSpell(uint32 spellId) const;
+    void UpgradeActionButtonsForLearnedSpell(uint32 newSpellId);
 
     PvPInfo pvpInfo;
     void UpdatePvPState();

@@ -5745,6 +5745,13 @@ void Player::_LoadActions(PreparedQueryResult result)
             uint32 action = fields[1].Get<uint32>();
             uint8 type = fields[2].Get<uint8>();
 
+            if (type == ACTION_BUTTON_SPELL)
+            {
+                uint32 const resolved = ResolveActionButtonSpell(action);
+                if (resolved)
+                    action = resolved;
+            }
+
             if (ActionButton* ab = addActionButton(button, action, type))
                 ab->uState = ACTIONBUTTON_UNCHANGED;
             else
