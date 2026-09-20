@@ -2558,6 +2558,21 @@ void Player::InitTalentForLevel()
         SendTalentsInfoData(false);                         // update at client
 }
 
+void Player::RecalculateUsedTalentCount()
+{
+    uint32 spent = 0;
+    for (PlayerTalentMap::const_iterator itr = m_talents.begin(); itr != m_talents.end(); ++itr)
+    {
+        if (itr->second->State == PLAYERSPELL_REMOVED)
+            continue;
+        if (!itr->second->IsInSpec(m_activeSpec))
+            continue;
+        if (TalentSpellPos const* pos = GetTalentSpellPos(itr->first))
+            spent += pos->rank + 1;
+    }
+    m_usedTalentCount = spent;
+}
+
 void Player::InitStatsForLevel(bool reapplyMods)
 {
     if (reapplyMods)                                        //reapply stats values only on .reset stats (level) command

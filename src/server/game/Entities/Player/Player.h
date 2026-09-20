@@ -1730,6 +1730,7 @@ public:
     [[nodiscard]] uint32 resetTalentsCost() const;
     bool IsMaxLevel() const;
     void InitTalentForLevel();
+    void RecalculateUsedTalentCount();
     void BuildPlayerTalentsInfoData(WorldPacket* data);
     void BuildPetTalentsInfoData(WorldPacket* data);
     void SendTalentsInfoData(bool pet);
