@@ -5655,6 +5655,10 @@ uint32 Player::ResolveActionButtonSpell(uint32 spellId) const
     if (HasSpell(spellId) || HasTalent(spellId, GetActiveSpec()))
         return spellId;
 
+    if (Pet* pet = const_cast<Player*>(this)->GetPet())
+        if (pet->HasSpell(spellId))
+            return spellId;
+
     uint32 const first = sSpellMgr->GetFirstSpellInChain(spellId);
     uint32 best = 0;
     for (SpellInfo const* info = sSpellMgr->GetSpellInfo(first); info; info = info->GetNextRankSpell())

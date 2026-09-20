@@ -20,6 +20,7 @@
 #include "Log.h"
 #include "ObjectMgr.h"
 #include "Opcodes.h"
+#include "Pet.h"
 #include "Player.h"
 #include "ScriptMgr.h"
 #include "Spell.h"
@@ -469,7 +470,19 @@ void WorldSession::HandleCastSpellOpcode(WorldPacket& recvPacket)
             */
 
             if (!allow)
+            {
+                if (Pet* pet = mover->ToPlayer()->GetPet())
+                {
+                    if (pet->HasSpell(spellId) && !spellInfo->IsPassive())
+                    {
+                        Spell* petSpell = new Spell(pet, spellInfo, triggerFlag);
+                        petSpell->m_cast_count = castCount;
+                        petSpell->prepare(&targets);
+                        return;
+                    }
+                }
                 return;
+            }
         }
     }
     else
