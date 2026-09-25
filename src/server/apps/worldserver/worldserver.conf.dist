@@ -4211,7 +4211,7 @@ Chat.MuteTimeFirstLogin = 120
 #        Default:     1 - (Enabled, Allow join to channel only if registered in LFG)
 #                     0 - (Disabled, Allow join to channel in any time)
 
-Channel.RestrictedLfg = 1
+Channel.RestrictedLfg = 0
 
 #
 #    Channel.SilentlyGMJoin
