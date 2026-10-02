@@ -1004,6 +1004,30 @@ void ScriptMgr::OnPlayerAfterTrainSpell(Player* player, Creature* trainer, uint3
     CALL_ENABLED_HOOKS(PlayerScript, PLAYERHOOK_ON_AFTER_TRAIN_SPELL, script->OnPlayerAfterTrainSpell(player, trainer, spellId));
 }
 
+bool ScriptMgr::OnUpdateAttackPowerAndDamageReplaceWithAlternativeCalculation(Player* player, bool ranged)
+{
+    CALL_ENABLED_BOOLEAN_HOOKS_WITH_DEFAULT_FALSE(PlayerScript, PLAYERHOOK_ON_UPDATE_ATTACK_POWER_AND_DAMAGE_REPLACE_WITH_ALTERNATIVE_CALCULATION,
+        script->OnUpdateAttackPowerAndDamageReplaceWithAlternativeCalculation(player, ranged));
+}
+
+bool ScriptMgr::OnPlayerLearnTalentUseAlternativeLogic(Player* player, uint32 talentId, uint32 talentRank, bool command /*= false*/)
+{
+    CALL_ENABLED_BOOLEAN_HOOKS_WITH_DEFAULT_FALSE(PlayerScript, PLAYERHOOK_ON_LEARN_TALENT_USE_ALTERNATIVE_LOGIC,
+        script->OnPlayerLearnTalentUseAlternativeLogic(player, talentId, talentRank, command));
+}
+
+bool ScriptMgr::OnPlayerUpdateDodgeUseAlternative(Player* player)
+{
+    CALL_ENABLED_BOOLEAN_HOOKS_WITH_DEFAULT_FALSE(PlayerScript, PLAYERHOOK_ON_UPDATE_DODGE_USE_ALTERNATIVE,
+        script->OnPlayerUpdateDodgeUseAlternative(player));
+}
+
+bool ScriptMgr::OnPlayerUpdateParryUseAlternative(Player* player)
+{
+    CALL_ENABLED_BOOLEAN_HOOKS_WITH_DEFAULT_FALSE(PlayerScript, PLAYERHOOK_ON_UPDATE_PARRY_USE_ALTERNATIVE,
+        script->OnPlayerUpdateParryUseAlternative(player));
+}
+
 PlayerScript::PlayerScript(char const* name, std::vector<uint16> enabledHooks)
     : ScriptObject(name, PLAYERHOOK_END)
 {

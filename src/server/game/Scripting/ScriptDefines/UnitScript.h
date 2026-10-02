@@ -44,6 +44,7 @@ enum UnitHook
     UNITHOOK_ON_UNIT_EXIT_COMBAT,
     UNITHOOK_ON_UNIT_DEATH,
     UNITHOOK_ON_UNIT_SET_SHAPESHIFT_FORM,
+    UNITHOOK_ON_EXTRA_PROC_HANDLE_REACTION_STATES,
     UNITHOOK_END
 };
 
@@ -110,6 +111,12 @@ public:
     virtual void OnUnitExitCombat(Unit* /*unit*/) { }
     virtual void OnUnitDeath(Unit* /*unit*/, Unit* /*killer*/) { }
     virtual void OnUnitSetShapeshiftForm(Unit* /*unit*/, uint8 /*form*/) { }
+
+    /**
+     * @brief Wrap stock crit/parry/dodge/block aura-state updates (classless).
+     * When any script returns true, stock class-gated reaction logic is skipped.
+     */
+    virtual bool OnExtraProcHandleReactionStates(Unit* /*unit*/, Unit* /*target*/, bool /*isVictim*/, uint32 /*procFlags*/) { return false; }
 };
 
 #endif

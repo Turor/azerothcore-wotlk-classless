@@ -383,6 +383,10 @@ public: /* PlayerScript */
     void OnPlayerAfterUpdateMaxHealth(Player* player, float& value);
     void OnPlayerBeforeUpdateAttackPowerAndDamage(Player* player, float& level, float& val2, bool ranged);
     void OnPlayerAfterUpdateAttackPowerAndDamage(Player* player, float& level, float& base_attPower, float& attPowerMod, float& attPowerMultiplier, bool ranged);
+    bool OnUpdateAttackPowerAndDamageReplaceWithAlternativeCalculation(Player* player, bool ranged);
+    bool OnPlayerUpdateParryUseAlternative(Player* player);
+    bool OnPlayerUpdateDodgeUseAlternative(Player* player);
+    bool OnPlayerLearnTalentUseAlternativeLogic(Player* player, uint32 talentId, uint32 talentRank, bool command = false);
     void OnPlayerBeforeInitTalentForLevel(Player* player, uint8& level, uint32& talentPointsForLevel);
     void OnPlayerFirstLogin(Player* player);
     void OnPlayerSetMaxLevel(Player* player, uint32& maxPlayerLevel);
@@ -582,6 +586,7 @@ public: /* UnitScript */
     void OnUnitExitCombat(Unit* unit);
     void OnUnitDeath(Unit* unit, Unit* killer);
     void OnUnitSetShapeshiftForm(Unit* unit, uint8 form);
+    bool OnExtraProcHandleReactionStates(Unit* unit, Unit* target, bool isVictim, uint32 procFlags);
 
 public: /* MovementHandlerScript */
     void OnPlayerMove(Player* player, MovementInfo movementInfo, uint32 opcode);
