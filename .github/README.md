@@ -4,6 +4,37 @@
 [![CodeFactor](https://www.codefactor.io/repository/github/azerothcore/azerothcore-wotlk/badge)](https://www.codefactor.io/repository/github/azerothcore/azerothcore-wotlk)
 [![Discord](https://img.shields.io/discord/217589275766685707?logo=discord&logoColor=white)](https://discord.gg/gkt4y2x "Our community hub on Discord")
 
+## Turor fork: Playerbot + Classless
+
+This branch (`feature/playerbot-classless-report`) starts from
+[`mod-playerbots/azerothcore-wotlk` `Playerbot`](https://github.com/mod-playerbots/azerothcore-wotlk/tree/Playerbot)
+and re-applies Turor classless core hooks surgically (see
+`~/Work/playerbots-investigation/CLASSLESS-REAPPLY-ON-PLAYERBOT.md`).
+
+**Clone with modules:**
+
+```bash
+git clone --recursive https://github.com/Turor/azerothcore-wotlk-classless.git
+cd azerothcore-wotlk-classless
+git checkout feature/playerbot-classless-report
+git submodule update --init --recursive
+```
+
+**Pinned modules (re-verify after green build):**
+
+| Module | Pin | Notes |
+|--------|-----|-------|
+| mod-playerbots | `037c014` | Matches this Playerbot core tip family |
+| mod-classless | `f11272f` | Turor classless |
+| mod-ale | `328718a` | Turor `classless-acore` lineage — may need newer pin if Script signatures drifted vs Playerbot tip |
+| mod-ah-bot-plus | `f685832` | Turor |
+| mod-dungeonmaster | `fd353a9` | Turor |
+| mod-starter-guild | `6012bc4` | Turor |
+
+Keep Playerbot `MOD_PLAYERBOTS` cmake / ModuleDatabasePool. Do **not** merge this into classless-only `master` without an explicit decision.
+
+---
+
 ## Build Status
 
 [![nopch-build](https://github.com/azerothcore/azerothcore-wotlk/actions/workflows/core-build-nopch.yml/badge.svg?branch=master)](https://github.com/azerothcore/azerothcore-wotlk/actions/workflows/core-build-nopch.yml?query=branch%3Amaster)

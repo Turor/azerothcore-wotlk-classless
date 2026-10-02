@@ -11,6 +11,12 @@
 !/modules/CMakeLists.txt
 !/modules/*.h
 !/modules/*.cmake
+!/modules/mod-ale
+!/modules/mod-classless
+!/modules/mod-dungeonmaster
+!/modules/mod-ah-bot-plus
+!/modules/mod-starter-guild
+!/modules/mod-playerbots
 /build*/
 /var/*
 !/var/build/.gitkeep

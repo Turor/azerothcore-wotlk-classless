@@ -1,0 +1,18 @@
+[submodule "modules/mod-classless"]
+	path = modules/mod-classless
+	url = https://github.com/Turor/mod-classless.git
+[submodule "modules/mod-ale"]
+	path = modules/mod-ale
+	url = https://github.com/Turor/mod-ale.git
+[submodule "modules/mod-ah-bot-plus"]
+	path = modules/mod-ah-bot-plus
+	url = https://github.com/Turor/mod-ah-bot-plus.git
+[submodule "modules/mod-dungeonmaster"]
+	path = modules/mod-dungeonmaster
+	url = https://github.com/Turor/mod-dungeonmaster.git
+[submodule "modules/mod-starter-guild"]
+	path = modules/mod-starter-guild
+	url = https://github.com/Turor/mod-starter-guild.git
+[submodule "modules/mod-playerbots"]
+	path = modules/mod-playerbots
+	url = https://github.com/mod-playerbots/mod-playerbots.git
