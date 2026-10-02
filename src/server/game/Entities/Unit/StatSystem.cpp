@@ -346,6 +346,9 @@ void Player::ApplyFeralAPBonus(int32 amount, bool apply)
 
 void Player::UpdateAttackPowerAndDamage(bool ranged)
 {
+    if (sScriptMgr->OnUpdateAttackPowerAndDamageReplaceWithAlternativeCalculation(this, ranged))
+        return;
+
     float val2 = 0.0f;
     float level = float(GetLevel());
 
@@ -752,6 +755,9 @@ float Player::GetMissPercentageFromDefence() const
 
 void Player::UpdateParryPercentage()
 {
+    if (sScriptMgr->OnPlayerUpdateParryUseAlternative(this))
+        return;
+
     const float parry_cap[MAX_CLASSES] =
     {
         47.003525f,     // Warrior
@@ -798,6 +804,9 @@ void Player::UpdateParryPercentage()
 
 void Player::UpdateDodgePercentage()
 {
+    if (sScriptMgr->OnPlayerUpdateDodgeUseAlternative(this))
+        return;
+
     const float dodge_cap[MAX_CLASSES] =
     {
         88.129021f,     // Warrior
