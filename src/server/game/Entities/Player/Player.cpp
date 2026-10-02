@@ -2610,6 +2610,21 @@ void Player::InitTalentForLevel()
         SendTalentsInfoData(false);                         // update at client
 }
 
+void Player::RecalculateUsedTalentCount()
+{
+    uint32 spent = 0;
+    for (PlayerTalentMap::const_iterator itr = m_talents.begin(); itr != m_talents.end(); ++itr)
+    {
+        if (itr->second->State == PLAYERSPELL_REMOVED)
+            continue;
+        if (!itr->second->IsInSpec(m_activeSpec))
+            continue;
+        if (TalentSpellPos const* pos = GetTalentSpellPos(itr->first))
+            spent += pos->rank + 1;
+    }
+    m_usedTalentCount = spent;
+}
+
 void Player::InitStatsForLevel(bool reapplyMods)
 {
     if (reapplyMods)                                        //reapply stats values only on .reset stats (level) command
@@ -3211,6 +3226,10 @@ bool Player::addSpell(uint32 spellId, uint8 addSpecMask, bool updateActive, bool
 
 bool Player::CheckSkillLearnedBySpell(uint32 spellId)
 {
+    // Classless characters keep other-class spells across login.
+    if (sConfigMgr->GetOption<bool>("ClasslessModule.Enable", false))
+        return true;
+
     if (!sWorld->getBoolConfig(CONFIG_VALIDATE_SKILL_LEARNED_BY_SPELLS))
         return true;
 
@@ -3434,6 +3453,7 @@ void Player::learnSpell(uint32 spellId, bool temporary /*= false*/, bool learnFr
     if (added)
     {
         sScriptMgr->OnPlayerLearnSpell(this, spellId);
+        UpgradeActionButtonsForLearnedSpell(spellId);
 
         // pussywizard: a system message "you have learnt spell X (rank Y)"
         if (IsInWorld())
@@ -5771,7 +5791,7 @@ bool Player::IsActionButtonDataValid(uint8 button, uint32 action, uint8 type)
                 return false;
             }
 
-            if (!HasSpell(action))
+            if (!ResolveActionButtonSpell(action))
             {
                 LOG_DEBUG("entities.player.loading", "Player::IsActionButtonDataValid Spell action {} not added into button {} for player {}: player don't known this spell", action, button, GetName());
                 return false;
@@ -5804,6 +5824,62 @@ ActionButton* Player::addActionButton(uint8 button, uint32 action, uint8 type)
 
     LOG_DEBUG("entities.player", "Player {} Added Action {} (type {}) to Button {}", GetGUID().ToString(), action, type, button);
     return &ab;
+}
+
+uint32 Player::ResolveActionButtonSpell(uint32 spellId) const
+{
+    if (!sSpellMgr->GetSpellInfo(spellId))
+        return 0;
+
+    if (HasSpell(spellId) || HasTalent(spellId, GetActiveSpec()))
+        return spellId;
+
+    if (Pet* pet = const_cast<Player*>(this)->GetPet())
+        if (pet->HasSpell(spellId))
+            return spellId;
+
+    uint32 const first = sSpellMgr->GetFirstSpellInChain(spellId);
+    uint32 best = 0;
+    for (SpellInfo const* info = sSpellMgr->GetSpellInfo(first); info; info = info->GetNextRankSpell())
+    {
+        uint32 const id = info->Id;
+        if (HasSpell(id) || HasTalent(id, GetActiveSpec()))
+            best = id;
+    }
+    return best;
+}
+
+void Player::UpgradeActionButtonsForLearnedSpell(uint32 newSpellId)
+{
+    SpellInfo const* newInfo = sSpellMgr->GetSpellInfo(newSpellId);
+    if (!newInfo)
+        return;
+
+    uint32 const first = sSpellMgr->GetFirstSpellInChain(newSpellId);
+    uint32 const newRank = newInfo->GetRank();
+    bool changed = false;
+
+    for (ActionButtonList::iterator itr = m_actionButtons.begin(); itr != m_actionButtons.end(); ++itr)
+    {
+        if (itr->second.uState == ACTIONBUTTON_DELETED)
+            continue;
+        if (itr->second.GetType() != ACTION_BUTTON_SPELL)
+            continue;
+
+        uint32 const action = itr->second.GetAction();
+        if (action == newSpellId || sSpellMgr->GetFirstSpellInChain(action) != first)
+            continue;
+
+        SpellInfo const* oldInfo = sSpellMgr->GetSpellInfo(action);
+        if (!oldInfo || oldInfo->GetRank() >= newRank)
+            continue;
+
+        itr->second.SetActionAndType(newSpellId, ACTION_BUTTON_SPELL);
+        changed = true;
+    }
+
+    if (changed && IsInWorld() && GetSession() && !GetSession()->PlayerLoading())
+        SendActionButtons(1);
 }
 
 void Player::removeActionButton(uint8 button)
@@ -14280,6 +14356,9 @@ void Player::CompletedAchievement(AchievementEntry const* entry)
 
 void Player::LearnTalent(uint32 talentId, uint32 talentRank, bool command /*= false*/)
 {
+    if (sScriptMgr->OnPlayerLearnTalentUseAlternativeLogic(this, talentId, talentRank, command))
+        return;
+
     uint32 CurTalentPoints = GetFreeTalentPoints();
 
     if (!command)

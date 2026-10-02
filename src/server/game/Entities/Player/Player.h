@@ -989,6 +989,7 @@ enum AdditionalSaving
     ADDITIONAL_SAVING_INVENTORY_AND_GOLD        = 0x01,
     ADDITIONAL_SAVING_QUEST_STATUS              = 0x02,
     ADDITIONAL_SAVING_ACHIEVEMENTS              = 0x04,
+    ADDITIONAL_SAVING_SPELLS_AND_TALENTS        = 0x08, // classless (PB owns 0x04 ACHIEVEMENTS)
 };
 
 enum PlayerCommandStates
@@ -1747,6 +1748,7 @@ public:
     void BuildPetTalentsInfoData(WorldPacket* data);
     void SendTalentsInfoData(bool pet);
     void LearnTalent(uint32 talentId, uint32 talentRank, bool command = false);
+    void RecalculateUsedTalentCount();
     void LearnPetTalent(ObjectGuid petGuid, uint32 talentId, uint32 talentRank);
 
     bool addTalent(uint32 spellId, uint8 addSpecMask, uint8 oldTalentRank);
@@ -1867,6 +1869,8 @@ public:
 
     ActionButton* addActionButton(uint8 button, uint32 action, uint8 type);
     void removeActionButton(uint8 button);
+    uint32 ResolveActionButtonSpell(uint32 spellId) const;
+    void UpgradeActionButtonsForLearnedSpell(uint32 newSpellId);
     ActionButton const* GetActionButton(uint8 button);
     void SendInitialActionButtons() const { SendActionButtons(1); }
     void SendActionButtons(uint32 state) const;
@@ -1976,6 +1980,7 @@ public:
     void UpdateMaxHealth() override;
     void UpdateMaxPower(Powers power) override;
     void ApplyFeralAPBonus(int32 amount, bool apply);
+    [[nodiscard]] uint32 GetFeralAPBonus() const { return m_baseFeralAP; }
     void UpdateAttackPowerAndDamage(bool ranged = false) override;
     void UpdateShieldBlockValue();
     void ApplySpellPowerBonus(int32 amount, bool apply);
@@ -2654,7 +2659,9 @@ public:
     void SetMountBlockId(uint32 mount) { m_MountBlockId = mount; }
 
     [[nodiscard]] float GetRealParry() const { return m_realParry; }
+    void SetRealParry(float parry) { m_realParry = parry; }
     [[nodiscard]] float GetRealDodge() const { return m_realDodge; }
+    void SetRealDodge(float dodge) { m_realDodge = dodge; }
     // mt maps
     [[nodiscard]] PlayerTalentMap const& GetTalentMap() const { return m_talents; }
     [[nodiscard]] uint32 GetNextSave() const { return m_nextSave; }

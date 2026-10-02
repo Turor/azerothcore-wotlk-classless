@@ -2470,5 +2470,12 @@ void Player::UpdateAdditionalSaves(uint32 p_time)
         SaveGoldToDB(trans);
     }
 
+    if (mask & ADDITIONAL_SAVING_SPELLS_AND_TALENTS)
+    {
+        _SaveTalents(trans);
+        _SaveSpells(trans);
+        _SaveGlyphs(trans);
+    }
+
     CharacterDatabase.CommitTransaction(trans);
 }
