@@ -722,7 +722,7 @@ const float m_diminishing_k[MAX_CLASSES] =
     0.9880f,  // Shaman
     0.9830f,  // Mage
     0.9830f,  // Warlock
-    0.0f,     // ??
+    0.9640f,  // Hero: mean of Paladin and Druid
     0.9720f   // Druid
 };
 
@@ -739,7 +739,7 @@ float Player::GetMissPercentageFromDefence() const
         16.00f,     // Shaman  //?
         16.00f,     // Mage    //?
         16.00f,     // Warlock //?
-        0.0f,       // ??
+        16.00f,     // Hero
         16.00f      // Druid   //?
     };
 
@@ -769,7 +769,7 @@ void Player::UpdateParryPercentage()
         145.560408f,    // Shaman
         0.0f,           // Mage
         0.0f,           // Warlock
-        0.0f,           // ??
+        47.003525f,     // Hero: can parry (Paladin cap); mod-classless overrides parry anyway
         0.0f            // Druid
     };
 
@@ -818,7 +818,7 @@ void Player::UpdateDodgePercentage()
         145.560408f,    // Shaman
         150.375940f,    // Mage
         150.375940f,    // Warlock
-        0.0f,           // ??
+        102.509864f,    // Hero: mean of Paladin and Druid
         116.890707f     // Druid
     };
 

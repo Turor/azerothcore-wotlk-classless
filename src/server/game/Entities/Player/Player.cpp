@@ -5310,7 +5310,7 @@ void Player::GetDodgeFromAgility(float& diminishing, float& nondiminishing)
         0.021080f, // Shaman
         0.036587f, // Mage
         0.024211f, // Warlock
-        0.0f,      // ??
+        0.045520f, // Hero: mean of Paladin and Druid
         0.056097f  // Druid
     };
     // Crit/agility to dodge/agility coefficient multipliers; 3.2.0 increased required agility by 15%
@@ -5325,7 +5325,7 @@ void Player::GetDodgeFromAgility(float& diminishing, float& nondiminishing)
         1.60f / 1.15f,  // Shaman
         1.00f / 1.15f,  // Mage
         0.97f / 1.15f,  // Warlock (?)
-        0.0f,           // ??
+        1.50f / 1.15f,  // Hero: mean of Paladin and Druid
         2.00f / 1.15f   // Druid
     };
 

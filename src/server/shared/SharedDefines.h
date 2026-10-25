@@ -132,12 +132,17 @@ enum Classes
     CLASS_SHAMAN        = 7, // TITLE Shaman
     CLASS_MAGE          = 8, // TITLE Mage
     CLASS_WARLOCK       = 9, // TITLE Warlock
-    //CLASS_UNK           = 10,
+    CLASS_HERO          = 10, // TITLE Hero (Turoran gauntlet class)
     CLASS_DRUID         = 11 // TITLE Druid
 };
 
 // max+1 for player class
 #define MAX_CLASSES       12
+
+// CLASS_HERO is deliberately NOT in CLASSMASK_ALL_PLAYABLE: Playerbots' random bot factory iterates
+// that mask, so leaving Hero out guarantees bots never roll a Hero. Classless already sets
+// AllowableClass=-1 on items and 2047 masks on talents/skills, which include the Hero bit (1 << 9).
+#define CLASSMASK_HERO (1 << (CLASS_HERO - 1))
 
 #define CLASSMASK_ALL_PLAYABLE \
     ((1<<(CLASS_WARRIOR-1))|(1<<(CLASS_PALADIN-1))|(1<<(CLASS_HUNTER-1))| \
