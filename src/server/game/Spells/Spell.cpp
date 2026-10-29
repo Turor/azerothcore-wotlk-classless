@@ -16,6 +16,7 @@
  */
 
 #include "Spell.h"
+#include "MobileCasting.h"
 #include "ArenaSpectator.h"
 #include "BattlefieldMgr.h"
 #include "Battleground.h"
@@ -3667,7 +3668,7 @@ SpellCastResult Spell::prepare(SpellCastTargets const* targets, AuraEffect const
 
     // don't allow channeled spells / spells with cast time to be casted while moving
     // (even if they are interrupted on moving, spells with almost immediate effect get to have their effect processed before movement interrupter kicks in)
-    if ((m_spellInfo->IsChanneled() || m_casttime) && unitCaster && unitCaster->IsPlayer() && unitCaster->isMoving() && m_spellInfo->InterruptFlags & SPELL_INTERRUPT_FLAG_MOVEMENT && !IsTriggered())
+    if ((m_spellInfo->IsChanneled() || m_casttime) && unitCaster && unitCaster->IsPlayer() && unitCaster->isMoving() && m_spellInfo->InterruptFlags & SPELL_INTERRUPT_FLAG_MOVEMENT && !IsTriggered() && !Turoran::CanCastWhileMoving(unitCaster))
     {
         // 1. Has casttime, 2. Or doesn't have flag to allow action during channel
         if (m_casttime || !m_spellInfo->IsActionAllowedChannel())
@@ -4544,7 +4545,8 @@ void Spell::update(uint32 difftime)
     // xinef: added preparing state (real cast, skip channels as they have other flags for this)
     if ((unitCaster && unitCaster->IsPlayer() && m_timer != 0) &&
             unitCaster->isMoving() && (m_spellInfo->InterruptFlags & SPELL_INTERRUPT_FLAG_MOVEMENT) && m_spellState == SPELL_STATE_PREPARING &&
-            (m_spellInfo->Effects[0].Effect != SPELL_EFFECT_STUCK || !unitCaster->HasUnitMovementFlag(MOVEMENTFLAG_FALLING_FAR)))
+            (m_spellInfo->Effects[0].Effect != SPELL_EFFECT_STUCK || !unitCaster->HasUnitMovementFlag(MOVEMENTFLAG_FALLING_FAR)) &&
+            !Turoran::CanCastWhileMoving(unitCaster))
     {
         // don't cancel for melee, autorepeat, triggered and instant spells
         if (!IsNextMeleeSwingSpell() && !IsAutoRepeat() && !IsTriggered())
@@ -6012,7 +6014,7 @@ SpellCastResult Spell::CheckCast(bool strict, uint32* /*param1*/, uint32* /*para
     {
         // skip stuck spell to allow use it in falling case and apply spell limitations at movement
         if ((!unitCaster->HasUnitMovementFlag(MOVEMENTFLAG_FALLING_FAR) || m_spellInfo->Effects[0].Effect != SPELL_EFFECT_STUCK) &&
-                (IsAutoRepeat() || (m_spellInfo->AuraInterruptFlags & AURA_INTERRUPT_FLAG_NOT_SEATED) != 0))
+                ((IsAutoRepeat() && !Turoran::CanCastWhileMoving(unitCaster)) || (m_spellInfo->AuraInterruptFlags & AURA_INTERRUPT_FLAG_NOT_SEATED) != 0))
             return SPELL_FAILED_MOVING;
     }
 

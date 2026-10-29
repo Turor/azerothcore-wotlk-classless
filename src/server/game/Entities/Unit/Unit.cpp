@@ -72,6 +72,8 @@
 #include "Util.h"
 #include "Vehicle.h"
 #include "World.h"
+#include "MobileCasting.h"
+#include "Config.h"
 #include "WorldPacket.h"
 #include <algorithm>
 #include <cmath>
@@ -5184,10 +5186,39 @@ void Unit::RemoveNotOwnSingleTargetAuras()
     }
 }
 
+uint32 Turoran::MobileCastingSpellId()
+{
+    static uint32 const spellId = sConfigMgr->GetOption<uint32>("Roguelike.MobileCastingSpell", 0, false);
+    return spellId;
+}
+
+bool Turoran::CanCastWhileMoving(Unit const* unit)
+{
+    if (!unit || !unit->IsPlayer())
+        return false;
+
+    uint32 spellId = MobileCastingSpellId();
+    if (!spellId)
+        return false;
+
+    return unit->ToPlayer()->HasSpell(spellId) || unit->HasAura(spellId);
+}
+
 void Unit::RemoveAurasWithInterruptFlags(uint32 flag, uint32 except, bool isAutoshot /*= false*/)
 {
     if (!(m_interruptMask & flag))
         return;
+
+    // Mobile Casting: movement/turning must not break the active channel (or its own aura on us)
+    uint32 const moveFlags = AURA_INTERRUPT_FLAG_MOVE | AURA_INTERRUPT_FLAG_TURNING;
+    uint32 channelFlag = flag;
+    uint32 keepChannelAura = 0;
+    if ((flag & moveFlags) && Turoran::CanCastWhileMoving(this))
+    {
+        channelFlag &= ~moveFlags;
+        if (Spell* channel = m_currentSpells[CURRENT_CHANNELED_SPELL])
+            keepChannelAura = channel->m_spellInfo->Id;
+    }
 
     // interrupt auras
     for (AuraApplicationList::iterator iter = m_interruptableAuras.begin(); iter != m_interruptableAuras.end();)
@@ -5196,6 +5227,9 @@ void Unit::RemoveAurasWithInterruptFlags(uint32 flag, uint32 except, bool isAuto
         ++iter;
         if ((aura->GetSpellInfo()->AuraInterruptFlags & flag) && (!except || aura->GetId() != except))
         {
+            if (keepChannelAura && aura->GetId() == keepChannelAura && !(aura->GetSpellInfo()->AuraInterruptFlags & channelFlag))
+                continue;
+
             uint32 removedAuras = m_removedAurasCount;
             RemoveAura(aura);
             if (m_removedAurasCount > removedAuras + 1)
@@ -5206,7 +5240,7 @@ void Unit::RemoveAurasWithInterruptFlags(uint32 flag, uint32 except, bool isAuto
     // interrupt channeled spell
     if (Spell* spell = m_currentSpells[CURRENT_CHANNELED_SPELL])
     {
-        if (spell->getState() == SPELL_STATE_CASTING && (spell->m_spellInfo->ChannelInterruptFlags & flag) && spell->m_spellInfo->Id != except)
+        if (spell->getState() == SPELL_STATE_CASTING && (spell->m_spellInfo->ChannelInterruptFlags & channelFlag) && spell->m_spellInfo->Id != except)
         {
             // Do not interrupt if auto shot
             if (!(isAutoshot && spell->m_spellInfo->HasAttribute(SPELL_ATTR2_DO_NOT_RESET_COMBAT_TIMERS)))

@@ -4800,6 +4800,18 @@ Daze.Enabled = 1
 InfiniteAmmo.Enabled = 0
 
 #
+#    Roguelike.MobileCastingSpell
+#        Description: Spell ID that grants "Mobile Casting" (Turoran Roguelike). A player who
+#                     knows the spell or has its aura is not interrupted by movement: cast-time
+#                     spells and channels may start and continue while moving, and the active
+#                     channel is not broken by AURA_INTERRUPT_FLAG_MOVE/TURNING. Other auras
+#                     (food, drink, ...) still break normally. The client must also be patched
+#                     (turoran_cwm.dll) or it will stop the cast itself.
+#        Default:     0 - (Disabled, blizzlike)
+
+Roguelike.MobileCastingSpell = 0
+
+#
 ###################################################################################################
 
 ###################################################################################################
